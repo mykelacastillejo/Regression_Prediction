@@ -1,0 +1,119 @@
+---
+title: "Regression_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyverse)
+require(tigerstats)
+```
+
+## First read in the data
+
+```{r}
+theData <- read.csv(file="mydata.csv",header = TRUE)
+```
+
+
+Now we are going to look at what relations that exist between our variables with plots.
+
+## Including Plots
+
+You can also embed plots, for example:
+
+## Now we see why ggplot is so cool
+
+```{r}
+M1 <- ggplot(theData,aes(x=SIMS,y=ARM))
+```
+## Now add scatterplot and fitted regression line + then add loess
+
+```{r}
+M1 + geom_point() 
+M1 + geom_point() + geom_lm() 
+M1 + geom_point() + geom_lm() + geom_smooth()
+```
+Let's take a look at how  predicts the final
+
+```{r}
+M2 <- ggplot(theData,aes(x=SIMS,y=GRIP))
+```
+## Now add scatterplot and fitted regression line + then add loess
+
+```{r}
+M2 + geom_point() 
+M2 + geom_point() + geom_lm() 
+M2 + geom_point() + geom_lm() + geom_smooth()
+```
+
+Now we will fit a linear model and look at and explain the summary results.
+
+```{r}
+model.1 <- lm(SIMS~ARM,data=theData)
+summary.lm(model.1)
+```
+
+```{r}
+model.2 <- lm(SIMS~GRIP,data=theData)
+summary.lm(model.2)
+```
+
+
+```{r}
+M3 <- ggplot(theData,aes(x=SIMS,y=ARM,z=GRIP))
+```
+## Now add scatterplot and fitted regression line + then add loess
+
+```{r}
+M3 + geom_point() 
+M3 + geom_point() + geom_lm() 
+M3 + geom_point() + geom_lm() + geom_smooth()
+```
+
+```{r}
+model.3 <- lm(SIMS~ARM+GRIP,data=theData)
+summary.lm(model.3)
+```
+
+```{r}
+M1 <- lm(SIMS ~ ARM, data=theData) 
+summary.lm(M1)
+summary(M1)$adj.r.squared
+```
+```{r}
+M2 <- lm(SIMS ~ GRIP, data=theData) 
+summary.lm(M2)
+summary(M2)$adj.r.squared
+```  
+```{r}
+M3 <- lm(SIMS ~ ARM + GRIP, data=theData) 
+summary.lm(M3)
+M3r2 <- summary(M3)$adj.r.squared
+```
+## Now we give a value of 104  for GRIP and 98 for ARM then find a 95% prediction interval of SIMS
+```{r}
+new <-data.frame(ARM=c(98), GRIP=c(104))
+```
+## Now we are going to see what the three models will predict 
+```{r}
+predict.lm(M1,new)
+```
+## Now Here is model 2
+```{r}
+predict.lm(M2,new)
+```
+## This with the 95% prediction interval of SIMS
+```{r}
+predict.lm(M1,new,interval = "prediction",se.fit = TRUE)
+```
+The 95% interval of M1 is (-1.185858,3.689886)
+```{r}
+predict.lm(M2,new,interval = "prediction",se.fit = TRUE)
+```
+The 95% interval of M2 is (-2.64982 2.486771)
+## Now we are going to compare Model1 with Model3 using anova
+```{r}
+anova(M1,M3)
+```
+By adding the Model 3 it reduced the room for error from 217.88 to 188.43 and since the p-value is less than 0.5 means there is a big difference in the relationship between model 1 and model 3.
